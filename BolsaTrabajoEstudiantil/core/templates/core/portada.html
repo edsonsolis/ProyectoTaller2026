@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Inicio - Bolsa de Trabajo Estudiantil</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .box { background: white; padding: 40px; border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); text-align: center; max-width: 700px; }
+        h1 { color: #0d6efd; margin-bottom: 10px; }
+        p { color: #555; margin-bottom: 30px; }
+        .roles { display: flex; gap: 20px; justify-content: center; }
+        .card-rol { flex: 1; padding: 25px; border: 2px solid #e9ecef; border-radius: 12px; text-decoration: none; color: #333; transition: 0.3s; }
+        .card-rol:hover { border-color: #0d6efd; background: #f8f9fa; transform: translateY(-5px); }
+        .icon { font-size: 40px; margin-bottom: 10px; }
+        .btn-voz { margin-top: 25px; background: #198754; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>🎓 Hub de Servicios Estudiantiles</h1>
+        <p>Conectando talento universitario con oportunidades de medio tiempo.</p>
+        
+        <div class="roles">
+            <a href="{% url 'estudiante' %}" class="card-rol">
+                <div class="icon">👨‍🎓</div>
+                <h3>Soy Estudiante</h3>
+                <small>Verifica tu carnet y ofrece tus conocimientos.</small>
+            </a>
+            <a href="{% url 'cliente' %}" class="card-rol">
+                <div class="icon">💼</div>
+                <h3>Soy Solicitante</h3>
+                <small>Busca, filtra y contrata servicios verificados.</small>
+            </a>
+        </div>
+
+        <button class="btn-voz" onclick="leerBienvenida()">🔊 Guía de Voz para Accesibilidad</button>
+    </div>
+
+    <script>
+        function leerBienvenida() {
+            const voz = new SpeechSynthesisUtterance("Bienvenido al Hub de Servicios Estudiantiles. Elija la opción de la izquierda si es estudiante, o la de la derecha si busca contratar un servicio.");
+            voz.lang = 'es-ES';
+            window.speechSynthesis.speak(voz);
+        }
+    </script>
+</body>
+</html>

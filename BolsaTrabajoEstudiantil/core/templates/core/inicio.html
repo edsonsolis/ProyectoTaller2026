@@ -65,7 +65,7 @@
 
                     {% if categoria_detectada %}
                     <div class="alert alert-success mt-3 text-center" role="alert">
-                        🤖 Categoría asignada: <b>{{ categoria_detectada|upper }}</b>
+                         Categoría asignada: <b>{{ categoria_detectada|upper }}</b>
                     </div>
                     {% endif %}
                 </div>
@@ -74,7 +74,7 @@
             <!-- Columna Derecha: Tabla Dinámica Ordenada por Prioridad -->
             <div class="col-md-8">
                 <div class="card shadow-sm border-0 p-4">
-                    <h4 class="mb-3 text-secondary">📋 Ofertas Disponibles (Priorizadas por Popularidad)</h4>
+                    <h4 class="mb-3 text-secondary">Ofertas Disponibles (Priorizadas por Popularidad)</h4>
                     <div class="mb-3 d-flex gap-2 flex-wrap">
                    <a href="?filtro_categoria=todas" class="btn btn-sm {% if filtro_actual == 'todas' %}btn-dark{% else %}btn-outline-dark{% endif %}">Todas</a>
                    <a href="?filtro_categoria=sistemas" class="btn btn-sm {% if filtro_actual == 'sistemas' %}btn-primary{% else %}btn-outline-primary{% endif %}">Sistemas</a>
@@ -98,7 +98,7 @@
                                 <tr>
                                     <td><b>{{ s.titulo }}</b><br><small class="text-muted">{{ s.entidad }} - {{ s.ubicacion }}</small></td>
                                     <td><span class="badge bg-secondary">{{ s.categoria|upper }}</span></td>
-                                    <td class="text-success fw-bold">bs{{ s.precio_descuento }}</td>
+                                    <td class="text-success fw-bold">Bs{{ s.precio_descuento }}</td>
                                     <td>{{ s.popularidad }} ⭐</td>
                                     <td>
                                         <!-- Botón de Texto a Voz (Punto 7: Generación de sonido) -->

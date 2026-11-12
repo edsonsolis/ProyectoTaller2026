@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat de Coordinación</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; }
+        .chat-box { max-width: 600px; margin: auto; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow: hidden; }
+        .chat-header { background: #198754; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .chat-header a { color: white; text-decoration: none; font-weight: bold; }
+        .mensajes { height: 320px; overflow-y: auto; padding: 20px; background: #e5ddd5; display: flex; flex-direction: column; gap: 10px; }
+        .burbuja { padding: 10px 15px; border-radius: 10px; max-width: 75%; background: white; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .burbuja.cliente { align-self: flex-end; background: #dcf8c6; }
+        .form-chat { display: flex; padding: 15px; gap: 10px; background: #f8f9fa; }
+        select, input { padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
+        input { flex: 1; }
+        button { background: #198754; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="chat-box">
+        <div class="chat-header">
+            <div>
+                <h3 style="margin:0;">💬 Coordinando: {{ titulo_oferta }}</h3>
+                <small>Estructura Dinámica: Cola FIFO (First-In, First-Out)</small>
+            </div>
+            <a href="{% url 'cliente' %}">✖ Cerrar</a>
+        </div>
+
+        <div class="mensajes">
+            {% for m in mensajes %}
+                <div class="burbuja {% if m.remitente == 'Cliente' %}cliente{% endif %}">
+                    <small style="font-weight:bold; color:#075e54;">{{ m.remitente }}:</small><br>
+                    {{ m.texto }}
+                </div>
+            {% empty %}
+                <p style="text-align:center; color:#666;">Inicia la conversación para acordar horarios y lugar.</p>
+            {% endfor %}
+        </div>
+
+        <form method="POST" class="form-chat">
+            {% csrf_token %}
+            <select name="remitente">
+                <option value="Cliente">Soy Cliente</option>
+                <option value="Estudiante">Soy Estudiante</option>
+            </select>
+            <input type="text" name="mensaje" required placeholder="Escribe un mensaje aquí...">
+            <button type="submit">Enviar</button>
+        </form>
+    </div>
+</body>
+</html>

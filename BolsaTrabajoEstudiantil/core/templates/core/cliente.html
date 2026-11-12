@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Catálogo de Servicios - Solicitante</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; }
+        .header { background: #212529; color: white; padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .header a { color: #0dcaf0; text-decoration: none; font-weight: bold; }
+        .filtros { background: white; padding: 15px; border-radius: 10px; margin: 20px 0; display: flex; gap: 15px; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+        select, input { padding: 8px; border: 1px solid #ccc; border-radius: 6px; }
+        .btn { padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block; }
+        .btn-filtrar { background: #0d6efd; color: white; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); display: flex; flex-direction: column; justify-content: space-between; }
+        .badge { background: #6c757d; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; text-transform: uppercase; }
+        .precio { font-size: 22px; color: #198754; font-weight: bold; margin: 10px 0; }
+        .precio del { font-size: 14px; color: #999; font-weight: normal; }
+        .acciones { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-voz { background: #0dcaf0; color: black; flex: 1; text-align: center; }
+        .btn-chat { background: #198754; color: white; flex: 1; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h2 style="margin:0;">💼 Servicios Estudiantiles Disponibles</h2>
+                <small>Ordenados automáticamente por Cola de Prioridad (Popularidad)</small>
+            </div>
+            <a href="{% url 'portada' %}">⬅ Cambiar Rol</a>
+        </div>
+
+        <!-- Formulario GET usando tu librería MotorOfertas -->
+        <form method="GET" class="filtros">
+            <label><b>Filtrar por Área:</b></label>
+            <select name="categoria">
+                <option value="todas" {% if filtro_actual == 'todas' %}selected{% endif %}>Todas las áreas</option>
+                <option value="sistemas" {% if filtro_actual == 'sistemas' %}selected{% endif %}>Sistemas</option>
+                <option value="medicina" {% if filtro_actual == 'medicina' %}selected{% endif %}>Medicina</option>
+                <option value="mecanica" {% if filtro_actual == 'mecanica' %}selected{% endif %}>Mecánica</option>
+                <option value="derecho" {% if filtro_actual == 'derecho' %}selected{% endif %}>Derecho</option>
+                <option value="agronomia" {% if filtro_actual == 'agronomia' %}selected{% endif %}>Agronomía</option>
+                <option value="humanidades" {% if filtro_actual == 'humanidades' %}selected{% endif %}>Humanidades</option>
+            </select>
+
+            <label><b>Precio Máximo ($):</b></label>
+            <input type="number" name="precio_max" value="{{ precio_max }}" placeholder="Ej: 150">
+
+            <button type="submit" class="btn btn-filtrar">🔍 Aplicar Filtros</button>
+            <a href="{% url 'cliente' %}" class="btn" style="background:#e9ecef; color:#333;">Limpiar</a>
+        </form>
+
+        <div class="grid">
+            {% for s in servicios %}
+            <div class="card">
+                <div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="badge">{{ s.categoria }}</span>
+                        <span>⭐ {{ s.popularidad }}</span>
+                    </div>
+                    <h3 style="margin: 12px 0 5px 0;">{{ s.titulo }}</h3>
+                    <small style="color:#666;">🏛️ {{ s.entidad }} | 📍 {{ s.ubicacion }} ({{ s.modalidad }})</small>
+                    <div class="precio">${{ s.precio_descuento }} <del>${{ s.precio_original }}</del></div>
+                </div>
+                <div class="acciones">
+                    <button class="btn btn-voz" onclick="leer('{{ s.titulo }}, categoría {{ s.categoria }}, precio {{ s.precio_descuento }} dólares')">🔊 Leer</button>
+                    <a href="{% url 'chat' s.titulo %}" class="btn btn-chat">💬 Contactar</a>
+                </div>
+            </div>
+            {% empty %}
+                <p>No se encontraron ofertas con esos filtros.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        function leer(texto) {
+            const voz = new SpeechSynthesisUtterance(texto);
+            voz.lang = 'es-ES';
+            window.speechSynthesis.speak(voz);
+        }
+    </script>
+</body>
+</html>

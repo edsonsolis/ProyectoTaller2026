@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-xwi5sz)=dtu*qbyezle1ke89$q1r)ka*xu-w+oj&+6+@pgdw&5
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -126,3 +126,4 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
+ALLOWED_HOSTS = ['*']

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Estudiante - Publicar Servicio</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h2 { color: #0d6efd; margin-top: 0; }
+        label { display: block; font-weight: bold; margin-top: 12px; color: #333; }
+        input, textarea, select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        .row { display: flex; gap: 15px; }
+        .row div { flex: 1; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 15px; }
+        .btn-primary { background: #0d6efd; color: white; }
+        .btn-mic { background: #dc3545; color: white; margin-top: 8px; padding: 8px; }
+        .alert { background: #d1e7dd; color: #0f5132; padding: 15px; border-radius: 8px; margin-bottom: 15px; font-weight: bold; }
+        .nav { margin-bottom: 15px; }
+        .nav a { text-decoration: none; color: #0d6efd; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav"><a href="{% url 'portada' %}">⬅ Volver a Portada</a></div>
+        <h2>👨‍🎓 Portal del Estudiante</h2>
+        <p>Completa tus datos. Nuestro sistema NLP asignará tu carrera automáticamente.</p>
+
+        {% if mensaje_exito %}
+            <div class="alert">✅ {{ mensaje_exito }}</div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <label>Título corto del servicio:</label>
+            <input type="text" name="titulo" required placeholder="Ej: Mantenimiento de computadoras y redes">
+
+            <label>Descripción detallada (El NLP analizará esto):</label>
+            <textarea id="desc" name="descripcion" rows="3" required placeholder="Ej: Sé programar en Python, reparar software y configurar sistemas..."></textarea>
+            <button type="button" class="btn btn-mic" id="btn-dictar">🎤 Dictar descripción por micrófono</button>
+
+            <div class="row">
+                <div>
+                    <label>Precio Normal ($):</label>
+                    <input type="number" name="precio_original" value="100" required>
+                </div>
+                <div>
+                    <label>Precio Oferta ($):</label>
+                    <input type="number" name="precio_descuento" value="80" required>
+                </div>
+            </div>
+
+            <div class="row">
+                <div>
+                    <label>Universidad / Instituto:</label>
+                    <input type="text" name="entidad" value="UMSS" required>
+                </div>
+                <div>
+                    <label>Ciudad / Zona:</label>
+                    <input type="text" name="ubicacion" value="Cochabamba" required>
+                </div>
+            </div>
+
+            <label>Modalidad:</label>
+            <select name="modalidad">
+                <option value="Presencial">Presencial</option>
+                <option value="Remoto">Remoto</option>
+            </select>
+
+            <label>🪪 Foto de Carnet Universitario (Verificación OpenCV en Hilo):</label>
+            <input type="file" name="carnet" accept="image/*">
+
+            <button type="submit" class="btn btn-primary">Verificar y Publicar Servicio</button>
+        </form>
+    </div>
+
+    <script>
+        const btnDictar = document.getElementById('btn-dictar');
+        const campoDesc = document.getElementById('desc');
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const rec = new SpeechRecognition();
+            rec.lang = 'es-ES';
+            btnDictar.onclick = () => { rec.start(); btnDictar.innerText = "🔴 Escuchando..."; };
+            rec.onresult = (e) => { campoDesc.value = e.results.transcript; btnDictar.innerText = "🎤 Dictar descripción por micrófono"; };
+        }
+    </script>
+</body>
+</html>

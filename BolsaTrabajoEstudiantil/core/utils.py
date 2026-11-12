@@ -6,6 +6,8 @@ from FiltroDeOferta.Oferta import Oferta
 import threading
 import cv2
 import numpy as np
+import unicodedata
+from collections import deque
 
 # Ruta absoluta al archivo XML
 XML_PATH = os.path.join(os.path.dirname(__file__), '../servicios.xml')
@@ -118,6 +120,14 @@ def guardar_imagen_en_hilo(ruta_destino: str):
     hilo = threading.Thread(target=procesar_imagen_accesibilidad, args=(ruta_destino,))
     hilo.start()
 
+COLA_MENSAJES_CHAT = deque(maxlen=50)
+
+def quitar_tildes(texto: str) -> str:
+    """Normaliza caracteres eliminando tildes para mejorar la precisión del NLP."""
+    return ''.join(
+        c for c in unicodedata.normalize('NFD', texto)
+        if unicodedata.category(c) != 'Mn'
+    )
 
 def categorizar_por_nlp(descripcion_texto: str) -> str:
     """Clasificador NLP básico por Bolsa de Palabras para categorizar servicios (Punto 3)."""
@@ -133,6 +143,8 @@ def categorizar_por_nlp(descripcion_texto: str) -> str:
         'mecanica': ['motores', 'frenos', 'auto', 'mantenimiento', 'taller', 'vehiculo', 'reparacion', 'aceite', 'mecanico'],
         'derecho': ['legal', 'abogado', 'contrato', 'asesoria', 'demanda', 'ley', 'defensa', 'tramites', 'juridico'],
         'quimica': [],
+        'agronomia': ['cultivo', 'tierra', 'plagas', 'riego', 'cosecha', 'suelo', 'plantas', 'ganado', 'fertilizante'],
+        'humanidades': ['redaccion', 'traduccion', 'historia', 'psicologia', 'ensayo', 'idiomas', 'ingles', 'literatura'],
         'electronica': [],
         'arquitectura':[]
     }
@@ -188,4 +200,6 @@ def oyente_procesamiento_visual(oferta):
 
 # Registramos los oyentes al evento 'oferta_creada'
 GestorEventos.suscribir('oferta_creada', oyente_auditoria)
-GestorEventos.suscribir('oferta_creada', oyente_procesamiento_visual)    
+GestorEventos.suscribir('oferta_creada', oyente_procesamiento_visual)  
+
+
