@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ofertas>
+    <oferta>
+        <titulo>Ayudante de Programación Python</titulo>
+        <categoria>sistemas</categoria>
+        <precio_original>100.0</precio_original>
+        <precio_descuento>80.0</precio_descuento>
+        <modalidad>Remoto</modalidad>
+        <ubicacion>Cochabamba</ubicacion>
+        <entidad>UMSS</entidad>
+        <fecha_expiracion>2026-12-31</fecha_expiracion>
+        <popularidad>4.8</popularidad>
+    </oferta>
+    <oferta>
+        <titulo>Inyectables y Signos Vitales</titulo>
+        <categoria>medicina</categoria>
+        <precio_original>50.0</precio_original>
+        <precio_descuento>40.0</precio_descuento>
+        <modalidad>Presencial</modalidad>
+        <ubicacion>Sacaba</ubicacion>
+        <entidad>Univalle</entidad>
+        <fecha_expiracion>2026-11-20</fecha_expiracion>
+        <popularidad>5.0</popularidad>
+    </oferta>
+    <oferta>
+        <titulo>Ofrezco servicios de abogado, ley y t...</titulo>
+        <categoria>derecho</categoria>
+        <precio_original>120.0</precio_original>
+        <precio_descuento>100.0</precio_descuento>
+        <modalidad>Remoto</modalidad>
+        <ubicacion>Cochabamba</ubicacion>
+        <entidad>Estudiante Verificado</entidad>
+        <fecha_expiracion />
+        <popularidad>4.7</popularidad>
+    </oferta>
+</ofertas>

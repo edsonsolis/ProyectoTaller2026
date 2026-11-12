@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hub de Trabajo Estudiantil</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://jsdelivr.net" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://jsdelivr.net">
+</head>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; color: #333; margin: 0; padding: 20px; }
+    .container { max-width: 1100px; margin: auto; }
+    .header { background: linear-gradient(135deg, #0d6efd, #0043a8); color: white; padding: 25px; border-radius: 12px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 25px; }
+    .header h1 { margin: 0 0 10px 0; font-size: 28px; }
+    .header p { margin: 0; opacity: 0.9; }
+    .grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
+    .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-family: inherit; margin-top: 8px; margin-bottom: 12px; }
+    button, .btn-filtro { padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block; font-size: 14px; }
+    .btn-primary { background-color: #0d6efd; color: white; width: 100%; }
+    .btn-primary:hover { background-color: #0b5ed7; }
+    .btn-danger { background-color: #dc3545; color: white; width: 100%; margin-bottom: 8px; }
+    .btn-info { background-color: #0dcaf0; color: #000; padding: 6px 12px; }
+    .filtros { margin-bottom: 15px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-filtro { background-color: #e9ecef; color: #333; }
+    .btn-filtro:hover { background-color: #dde0e3; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th { background-color: #212529; color: white; text-align: left; padding: 12px; }
+    td { padding: 12px; border-bottom: 1px solid #dee2e6; }
+    .badge { background-color: #6c757d; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+    .alert { background-color: #d1e7dd; color: #0f5132; padding: 12px; border-radius: 8px; margin-top: 15px; text-align: center; }
+    @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+</style>
+  
+</head>
+<body class="bg-light">
+
+    <div class="container my-5">
+        <!-- Encabezado -->
+        <div class="p-4 bg-white rounded shadow-sm mb-4 text-center">
+            <h1 class="display-5 fw-bold text-primary">Bolsa de Trabajo Estudiantil</h1>
+        </div>
+
+        <div class="row g-4">
+            <!-- Columna Izquierda: Formulario NLP Inteligente -->
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 p-4">
+                    <h4 class="mb-3 text-secondary">Publicar Servicio </h4>
+                     <form method="GET" action="">
+                        <div class="mb-3">
+                            <label class="form-label">Describe lo que sabes hacer:</label>
+                            <textarea id="campo-descripcion" name="descripcion" class="form-control" rows="4" placeholder="Ej: Ofrezco desarrollo web en Python, base de datos y código de sistemas..."></textarea>
+                        </div>
+                        
+                        <!-- Botón de Voz a Texto  -->
+                        <button type="button" class="btn btn-outline-danger w-100 mb-2" id="btn-dictar">
+                            <i class="bi bi-mic-fill"></i> Dictar por Micrófono
+                        </button>
+
+                        <button type="submit" class="btn btn-primary w-100">Enviar y Categorizar</button>
+                    </form>
+
+                    {% if categoria_detectada %}
+                    <div class="alert alert-success mt-3 text-center" role="alert">
+                        🤖 Categoría asignada: <b>{{ categoria_detectada|upper }}</b>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Columna Derecha: Tabla Dinámica Ordenada por Prioridad -->
+            <div class="col-md-8">
+                <div class="card shadow-sm border-0 p-4">
+                    <h4 class="mb-3 text-secondary">📋 Ofertas Disponibles (Priorizadas por Popularidad)</h4>
+                    <div class="mb-3 d-flex gap-2 flex-wrap">
+                   <a href="?filtro_categoria=todas" class="btn btn-sm {% if filtro_actual == 'todas' %}btn-dark{% else %}btn-outline-dark{% endif %}">Todas</a>
+                   <a href="?filtro_categoria=sistemas" class="btn btn-sm {% if filtro_actual == 'sistemas' %}btn-primary{% else %}btn-outline-primary{% endif %}">Sistemas</a>
+                   <a href="?filtro_categoria=medicina" class="btn btn-sm {% if filtro_actual == 'medicina' %}btn-success{% else %}btn-outline-success{% endif %}">Medicina</a>
+                   <a href="?filtro_categoria=mecanica" class="btn btn-sm {% if filtro_actual == 'mecanica' %}btn-warning{% else %}btn-outline-warning{% endif %}">Mecánica</a>
+                   <a href="?filtro_categoria=derecho" class="btn btn-sm {% if filtro_actual == 'derecho' %}btn-info{% else %}btn-outline-info{% endif %}">Derecho</a>
+                     </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Servicio</th>
+                                    <th>Categoría</th>
+                                    <th>Precio</th>
+                                    <th>Popularidad</th>
+                                    <th>Accesibilidad</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for s in servicios %}
+                                <tr>
+                                    <td><b>{{ s.titulo }}</b><br><small class="text-muted">{{ s.entidad }} - {{ s.ubicacion }}</small></td>
+                                    <td><span class="badge bg-secondary">{{ s.categoria|upper }}</span></td>
+                                    <td class="text-success fw-bold">bs{{ s.precio_descuento }}</td>
+                                    <td>{{ s.popularidad }} ⭐</td>
+                                    <td>
+                                        <!-- Botón de Texto a Voz (Punto 7: Generación de sonido) -->
+                                        <button class="btn btn-sm btn-info text-white" onclick="leerTexto('{{ s.titulo }} de la categoría {{ s.categoria }}')">
+                                            <i class="bi bi-volume-up-fill"></i> Leer
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript para el Control de Voz (Punto 7) -->
+    <script>
+        // 1. GENERACIÓN DE SONIDO: Texto a Voz (Lectura para personas con discapacidad visual - Punto 6)
+        function leerTexto(texto) {
+            const deVoz = new SpeechSynthesisUtterance(texto);
+            deVoz.lang = 'es-ES';
+            deVoz.rate = 1.0;
+            window.speechSynthesis.speak(deVoz);
+        }
+
+        // 2. ANÁLISIS DE SONIDO: Voz a Texto (Dictado por micrófono)
+        const btnDictar = document.getElementById('btn-dictar');
+        const campoDescripcion = document.getElementById('campo-descripcion');
+
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const reconocimiento = new SpeechRecognition();
+            reconocimiento.lang = 'es-ES';
+            reconocimiento.continuous = false;
+
+            btnDictar.addEventListener('click', () => {
+                reconocimiento.start();
+                btnDictar.innerHTML = '<i class="bi bi-record-fill text-blink"></i> Escuchando...';
+            });
+
+            reconocimiento.onresult = (event) => {
+                const textoDictado = event.results[0][0].transcript;
+                campoDescripcion.value = textoDictado;
+                btnDictar.innerHTML = '<i class="bi bi-mic-fill"></i> Dictar por Micrófono';
+            };
+
+            reconocimiento.onerror = () => {
+                btnDictar.innerHTML = '<i class="bi bi-mic-fill"></i> Error. Intenta de nuevo';
+            };
+        } else {
+            btnDictar.disabled = true;
+            btnDictar.innerText = "Micrófono no soportado en este navegador";
+        }
+    </script>
+</body>
+</html>
