@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Catálogo de Servicios - Solicitante</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #466696; padding: 20px; }
         .container { max-width: 1000px; margin: auto; }
         .header { background: #212529; color: white; padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
         .header a { color: #0dcaf0; text-decoration: none; font-weight: bold; }
@@ -14,7 +14,7 @@
         .btn-filtrar { background: #0d6efd; color: white; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
         .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); display: flex; flex-direction: column; justify-content: space-between; }
-        .badge { background: #6c757d; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; text-transform: uppercase; }
+        .badge { background: #3f4346; color: rgb(255, 255, 255); padding: 4px 8px; border-radius: 4px; font-size: 12px; text-transform: uppercase; }
         .precio { font-size: 22px; color: #198754; font-weight: bold; margin: 10px 0; }
         .precio del { font-size: 14px; color: #999; font-weight: normal; }
         .acciones { display: flex; gap: 10px; margin-top: 15px; }
@@ -45,7 +45,7 @@
                 <option value="humanidades" {% if filtro_actual == 'humanidades' %}selected{% endif %}>Humanidades</option>
             </select>
 
-            <label><b>Precio Máximo ($):</b></label>
+            <label><b>Precio Máximo (Bs):</b></label>
             <input type="number" name="precio_max" value="{{ precio_max }}" placeholder="Ej: 150">
 
             <button type="submit" class="btn btn-filtrar">🔍 Aplicar Filtros</button>
@@ -56,17 +56,36 @@
             {% for s in servicios %}
             <div class="card">
                 <div>
-                    <div style="display:flex; justify-content:space-between;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
                         <span class="badge">{{ s.categoria }}</span>
-                        <span>⭐ {{ s.popularidad }}</span>
+                        <span style="font-weight:bold;">⭐ {{ s.popularidad }}</span>
                     </div>
                     <h3 style="margin: 12px 0 5px 0;">{{ s.titulo }}</h3>
                     <small style="color:#666;">🏛️ {{ s.entidad }} | 📍 {{ s.ubicacion }} ({{ s.modalidad }})</small>
-                    <div class="precio">${{ s.precio_descuento }} <del>${{ s.precio_original }}</del></div>
+                    
+                    <!-- Descripción visible para el cliente -->
+                    <p style="font-size:14px; color:#444; background:#f8f9fa; padding:10px; border-radius:6px; margin:10px 0;">
+                        {{ s.descripcion }}
+                    </p>
+
+                    <div class="precio">Bs{{ s.precio_descuento }} <del>Bs{{ s.precio_original }}</del></div>
                 </div>
-                <div class="acciones">
-                    <button class="btn btn-voz" onclick="leer('{{ s.titulo }}, categoría {{ s.categoria }}, precio {{ s.precio_descuento }} dólares')">🔊 Leer</button>
-                    <a href="{% url 'chat' s.titulo %}" class="btn btn-chat">💬 Contactar</a>
+
+                <div>
+                    <!-- Botones para calificar y alimentar la Cola de Prioridad -->
+                    <div style="margin-bottom:10px; font-size:12px; color:#666; text-align:center; border-top:1px solid #eee; padding-top:8px;">
+                        Calificar servicio: 
+                        <a href="?calificar={{ s.titulo }}&puntos=1" style="text-decoration:none;">1⭐</a> |
+                        <a href="?calificar={{ s.titulo }}&puntos=2" style="text-decoration:none;">2⭐</a> |
+                        <a href="?calificar={{ s.titulo }}&puntos=3" style="text-decoration:none;">3⭐</a> |
+                        <a href="?calificar={{ s.titulo }}&puntos=4" style="text-decoration:none;">4⭐</a> |
+                        <a href="?calificar={{ s.titulo }}&puntos=5" style="text-decoration:none;">5⭐</a>
+                    </div>
+
+                    <div class="acciones">
+                        <button class="btn btn-voz" onclick="leer('{{ s.titulo }}. {{ s.descripcion }}. Precio {{ s.precio_descuento }} bolivianos')">🔊 Leer</button>
+                        <a href="{% url 'chat' s.titulo %}" class="btn btn-chat">💬 Contactar</a>
+                    </div>
                 </div>
             </div>
             {% empty %}

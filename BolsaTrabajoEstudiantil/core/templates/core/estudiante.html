@@ -2,88 +2,185 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Panel Estudiante - Publicar Servicio</title>
+    <title>Panel Estudiante - Mi Cuenta</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        h2 { color: #0d6efd; margin-top: 0; }
-        label { display: block; font-weight: bold; margin-top: 12px; color: #333; }
-        input, textarea, select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
-        .row { display: flex; gap: 15px; }
-        .row div { flex: 1; }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 15px; }
-        .btn-primary { background: #0d6efd; color: white; }
-        .btn-mic { background: #dc3545; color: white; margin-top: 8px; padding: 8px; }
-        .alert { background: #d1e7dd; color: #0f5132; padding: 15px; border-radius: 8px; margin-bottom: 15px; font-weight: bold; }
-        .nav { margin-bottom: 15px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #a4a6aa; padding: 20px; }
+        .wrapper { max-width: 1100px; margin: auto; }
+        .nav { margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
         .nav a { text-decoration: none; color: #0d6efd; font-weight: bold; }
+        .grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 20px; }
+        .card { background: rgb(177, 240, 237); padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        h2, h3 { color: #0d6efd; margin-top: 0; }
+        label { display: block; font-weight: bold; margin-top: 12px; color: #333; font-size: 13px; }
+        input, textarea, select { width: 100%; padding: 9px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        .input-voz { display: flex; gap: 6px; margin-top: 4px; align-items: stretch; }
+        .btn-micro { background: #0d6efd; color: white; border: none; border-radius: 6px; padding: 0 12px; cursor: pointer; font-size: 16px; transition: 0.2s; }
+        .btn-micro:hover { background: #0d6efd; }
+        .row { display: flex; gap: 12px; }
+        .row > div { flex: 1; }
+        .btn-primary { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 15px; background: #0d6efd; color: white; font-size: 15px; }
+        .alert { padding: 12px; border-radius: 8px; margin-bottom: 15px; font-weight: bold; }
+        .alert.success { background: #d1e7dd; color: #0f5132; }
+        .alert.error { background: #f8d7da; color: #842029; }
+        .item-oferta { border: 1px solid #e9ecef; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; }
+        .btn-borrar { background: #0d6efd; color: white; text-decoration: none; padding: 6px 12px; border-radius: 5px; font-size: 12px; font-weight: bold; }
+        #barra-voz { background: #fff3cd; color: #664d03; padding: 8px 12px; border-radius: 6px; font-size: 13px; margin-bottom: 10px; display: none; font-weight: bold; }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="nav"><a href="{% url 'portada' %}">⬅ Volver a Portada</a></div>
-        <h2>👨‍🎓 Portal del Estudiante</h2>
-        <p>Completa tus datos. Nuestro sistema NLP asignará tu carrera automáticamente.</p>
+    <div class="wrapper">
+        <div class="nav">
+            <a href="{% url 'portada' %}">⬅ Volver a Portada</a>
+            <span>Cuenta activa: <b>{{ autor_actual|default:"Sin iniciar sesión" }}</b></span>
+        </div>
 
-        {% if mensaje_exito %}
-            <div class="alert">✅ {{ mensaje_exito }}</div>
+        {% if mensaje %}
+            <div class="alert {{ tipo_alerta }}">{{ mensaje }}</div>
         {% endif %}
 
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            
-            <label>Título corto del servicio:</label>
-            <input type="text" name="titulo" required placeholder="Ej: Mantenimiento de computadoras y redes">
+        <div id="barra-voz"></div>
 
-            <label>Descripción detallada (El NLP analizará esto):</label>
-            <textarea id="desc" name="descripcion" rows="3" required placeholder="Ej: Sé programar en Python, reparar software y configurar sistemas..."></textarea>
-            <button type="button" class="btn btn-mic" id="btn-dictar">🎤 Dictar descripción por micrófono</button>
+        <div class="grid">
+            <!-- COLUMNA IZQUIERDA: FORMULARIO CON MICRÓFONOS AL COSTADO -->
+            <div class="card">
+                <h2>👨‍🎓 Publicar Nuevo Servicio</h2>
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div style="flex:2;">
+                            <label>Tu Nombre Completo:</label>
+                            <div class="input-voz">
+                                <input type="text" id="campo-nombre" name="nombre_estudiante" value="{{ autor_actual }}" required placeholder="Ej: Carlos Mamani">
+                                <button type="button" class="btn-micro" onclick="dictarA('campo-nombre')" title="Dictar nombre">🎤</button>
+                            </div>
+                        </div>
+                        <div style="flex:1;">
+                            <label>PIN Secreto (4 dígitos):</label>
+                            <input type="password" name="pin" value="{{ pin_actual }}" maxlength="4" required placeholder="Ej: 1234" style="margin-top:4px;">
+                        </div>
+                    </div>
 
-            <div class="row">
-                <div>
-                    <label>Precio Normal ($):</label>
-                    <input type="number" name="precio_original" value="100" required>
-                </div>
-                <div>
-                    <label>Precio Oferta ($):</label>
-                    <input type="number" name="precio_descuento" value="80" required>
-                </div>
+                    <label>Carrera / Área Profesional:</label>
+                    <select name="carrera" required style="margin-top:4px;">
+                        <option value="sistemas">Ingeniería de Sistemas / Informática</option>
+                        <option value="medicina">Medicina / Enfermería / Salud</option>
+                        <option value="mecanica">Mecánica Automotriz / Industrial</option>
+                        <option value="derecho">Derecho / Ciencias Jurídicas</option>
+                        <option value="agronomia">Agronomía / Veterinaria</option>
+                        <option value="humanidades">Humanidades / Idiomas / Educación</option>
+                    </select>
+
+                    <label>Título del servicio:</label>
+                    <div class="input-voz">
+                        <input type="text" id="campo-titulo" name="titulo" required placeholder="Ej: Reparación de computadoras">
+                        <button type="button" class="btn-micro" onclick="dictarA('campo-titulo')" title="Dictar título">🎤</button>
+                    </div>
+
+                    <label>Descripción detallada (Visible para el cliente):</label>
+                    <div class="input-voz">
+                        <textarea id="campo-desc" name="descripcion" rows="2" required placeholder="Explica qué incluye tu servicio, horarios, etc..."></textarea>
+                        <button type="button" class="btn-micro" onclick="dictarA('campo-desc')" title="Dictar descripción">🎤</button>
+                    </div>
+
+                    <div class="row">
+                        <div>
+                            <label>Precio Normal ($):</label>
+                            <input type="number" name="precio_original" value="100" required style="margin-top:4px;">
+                        </div>
+                        <div>
+                            <label>Precio Oferta ($):</label>
+                            <input type="number" name="precio_descuento" value="80" required style="margin-top:4px;">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div>
+                            <label>Universidad / Instituto:</label>
+                            <div class="input-voz">
+                                <input type="text" id="campo-uni" name="entidad" value="UMSS" required>
+                                <button type="button" class="btn-micro" onclick="dictarA('campo-uni')" title="Dictar universidad">🎤</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label>Ciudad / Zona:</label>
+                            <div class="input-voz">
+                                <input type="text" id="campo-ciudad" name="ubicacion" value="Cochabamba" required>
+                                <button type="button" class="btn-micro" onclick="dictarA('campo-ciudad')" title="Dictar ciudad">🎤</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <label>Modalidad:</label>
+                    <select name="modalidad" style="margin-top:4px;">
+                        <option value="Presencial">Presencial</option>
+                        <option value="Remoto">Remoto</option>
+                    </select>
+
+                    <label>Carnet Universitario (Verificación OpenCV):</label>
+                    <input type="file" name="carnet" accept="image/*" style="margin-top:4px;">
+
+                    <button type="submit" class="btn-primary">Verificar y Publicar Servicio</button>
+                </form>
             </div>
 
-            <div class="row">
-                <div>
-                    <label>Universidad / Instituto:</label>
-                    <input type="text" name="entidad" value="UMSS" required>
-                </div>
-                <div>
-                    <label>Ciudad / Zona:</label>
-                    <input type="text" name="ubicacion" value="Cochabamba" required>
-                </div>
+            <!-- COLUMNA DERECHA: ACCESO SEGURO CON PIN -->
+            <div class="card">
+                <h3>🔐 Gestionar Mis Publicaciones</h3>
+                <p style="font-size:13px; color:#666;">Ingresa tu nombre y tu PIN de 4 dígitos para administrar o eliminar tus ofertas:</p>
+                
+                <form method="GET" style="display:flex; gap:8px; margin-bottom:15px;">
+                    <input type="hidden" name="buscar_cuenta" value="1">
+                    <input type="text" name="autor" value="{{ autor_actual }}" placeholder="Tu nombre..." required style="flex:2;">
+                    <input type="password" name="pin_login" value="{{ pin_actual }}" placeholder="PIN" maxlength="4" required style="flex:1;">
+                    <button type="submit" style="background:#198754; color:white; border:none; border-radius:6px; padding:0 15px; font-weight:bold; cursor:pointer;">Entrar</button>
+                </form>
+
+                <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
+
+                {% for o in mis_ofertas %}
+                    <div class="item-oferta">
+                        <div>
+                            <b>{{ o.titulo }}</b><br>
+                            <small style="color:#555;">{{ o.categoria|upper }} | ${{ o.precio_descuento }} | ⭐ {{ o.popularidad }}</small>
+                        </div>
+                        <a href="?eliminar={{ o.titulo }}" class="btn-borrar" onclick="return confirm('¿Seguro que deseas eliminar esta publicación?')">🗑️ Eliminar</a>
+                    </div>
+                {% empty %}
+                    <p style="text-align:center; color:#888; margin-top:30px;">
+                        {% if autor_actual %}
+                            No se encontraron ofertas con ese Nombre y PIN.
+                        {% else %}
+                            Inicia sesión arriba con tu Nombre y PIN para ver tus ofertas.
+                        {% endif %}
+                    </p>
+                {% endfor %}
             </div>
-
-            <label>Modalidad:</label>
-            <select name="modalidad">
-                <option value="Presencial">Presencial</option>
-                <option value="Remoto">Remoto</option>
-            </select>
-
-            <label>🪪 Foto de Carnet Universitario (Verificación OpenCV en Hilo):</label>
-            <input type="file" name="carnet" accept="image/*">
-
-            <button type="submit" class="btn btn-primary">Verificar y Publicar Servicio</button>
-        </form>
+        </div>
     </div>
 
     <script>
-        const btnDictar = document.getElementById('btn-dictar');
-        const campoDesc = document.getElementById('desc');
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            const rec = new SpeechRecognition();
-            rec.lang = 'es-ES';
-            btnDictar.onclick = () => { rec.start(); btnDictar.innerText = "🔴 Escuchando..."; };
-            rec.onresult = (e) => { campoDesc.value = e.results.transcript; btnDictar.innerText = "🎤 Dictar descripción por micrófono"; };
-        }
-    </script>
-</body>
-</html>
+        function dictarA(idCampo) {
+            const barra = document.getElementById('barra-voz');
+            const campo = document.getElementById(idCampo);
+
+            if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+                barra.style.display = 'block';
+barra.innerText = "⚠️ Tu navegador no soporta voz. Usa Google Chrome o Edge.";
+return;
+}
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const rec = new SpeechRecognition();
+rec.lang = 'es-BO';
+barra.style.display = 'block';
+barra.innerText = "🔴 Escuchando... Habla ahora para llenar el campo.";
+rec.start();
+rec.onresult = (e) => {
+campo.value = e.results.transcript;
+barra.innerText = "✅ Texto capturado: '" + e.results.transcript + "'";
+};
+rec.onerror = (e) => {
+barra.innerText = "❌ Error de micrófono: " + e.error + " (Verifica permisos e internet).";
+};
+}
