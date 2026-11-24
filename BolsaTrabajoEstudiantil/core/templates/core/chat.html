@@ -19,32 +19,34 @@
 </head>
 <body>
     <div class="chat-box">
-        <div class="chat-header">
+         <div class="chat-header">
             <div>
-                <h3 style="margin:0;">💬 Coordinando: {{ titulo_oferta }}</h3>
-                <small>Estructura Dinámica: Cola FIFO (First-In, First-Out)</small>
+                <h3 style="margin:0;">💬 Sala: {{ titulo_oferta }}</h3>
+                <small>Conectado como: <b>{{ rol_usuario }}</b> </small>
             </div>
-            <a href="{% url 'cliente' %}">✖ Cerrar</a>
+            {% if es_estudiante %}
+                <a href="{% url 'estudiante' %}">✖ Volver a Mi Panel</a>
+            {% else %}
+                <a href="{% url 'cliente' %}">✖ Volver a Ofertas</a>
+            {% endif %}
         </div>
 
+        <!-- En el bloque de mensajes: -->
         <div class="mensajes">
             {% for m in mensajes %}
-                <div class="burbuja {% if m.remitente == 'Cliente' %}cliente{% endif %}">
+                <div class="burbuja {% if not m.es_estudiante %}cliente{% endif %}">
                     <small style="font-weight:bold; color:#075e54;">{{ m.remitente }}:</small><br>
                     {{ m.texto }}
                 </div>
             {% empty %}
-                <p style="text-align:center; color:#666;">Inicia la conversación para acordar horarios y lugar.</p>
+                <p style="text-align:center; color:#666;">Sala privada lista. Escribe un mensaje para coordinar.</p>
             {% endfor %}
         </div>
 
+        <!-- En el formulario inferior : -->
         <form method="POST" class="form-chat">
             {% csrf_token %}
-            <select name="remitente">
-                <option value="Cliente">Soy Cliente</option>
-                <option value="Estudiante">Soy Estudiante</option>
-            </select>
-            <input type="text" name="mensaje" required placeholder="Escribe un mensaje aquí...">
+            <input type="text" name="mensaje" required placeholder="Escribe como {{ rol_usuario }}...">
             <button type="submit">Enviar</button>
         </form>
     </div>

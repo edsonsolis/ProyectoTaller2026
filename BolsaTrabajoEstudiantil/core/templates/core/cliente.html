@@ -13,8 +13,8 @@
         .btn { padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block; }
         .btn-filtrar { background: #0d6efd; color: white; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); display: flex; flex-direction: column; justify-content: space-between; }
-        .badge { background: #3f4346; color: rgb(255, 255, 255); padding: 4px 8px; border-radius: 4px; font-size: 12px; text-transform: uppercase; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(242, 255, 0, 0.08); display: flex; flex-direction: column; justify-content: space-between; }
+        .badge { background: #112f46; color: rgb(255, 255, 255); padding: 4px 18px; border-radius: 4px; font-size: 18px; text-transform: uppercase; }
         .precio { font-size: 22px; color: #198754; font-weight: bold; margin: 10px 0; }
         .precio del { font-size: 14px; color: #999; font-weight: normal; }
         .acciones { display: flex; gap: 10px; margin-top: 15px; }
@@ -27,7 +27,6 @@
         <div class="header">
             <div>
                 <h2 style="margin:0;">💼 Servicios Estudiantiles Disponibles</h2>
-                <small>Ordenados automáticamente por Cola de Prioridad (Popularidad)</small>
             </div>
             <a href="{% url 'portada' %}">⬅ Cambiar Rol</a>
         </div>
@@ -43,6 +42,10 @@
                 <option value="derecho" {% if filtro_actual == 'derecho' %}selected{% endif %}>Derecho</option>
                 <option value="agronomia" {% if filtro_actual == 'agronomia' %}selected{% endif %}>Agronomía</option>
                 <option value="humanidades" {% if filtro_actual == 'humanidades' %}selected{% endif %}>Humanidades</option>
+                <option value="química" {% if filtro_actual == 'química' %}selected{% endif %}>Química</option>
+                <option value="matemáticas" {% if filtro_actual == 'matemáticas' %}selected{% endif %}>Matemáticas</option>
+                <option value="biología" {% if filtro_actual == 'biología' %}selected{% endif %}>Biología</option>electromecánica
+                <option value="electromecánica" {% if filtro_actual == 'electromecánica' %}selected{% endif %}>Electromecánica/ Electrónica/ Eléctrica</option>
             </select>
 
             <label><b>Precio Máximo (Bs):</b></label>
@@ -61,7 +64,7 @@
                         <span style="font-weight:bold;">⭐ {{ s.popularidad }}</span>
                     </div>
                     <h3 style="margin: 12px 0 5px 0;">{{ s.titulo }}</h3>
-                    <small style="color:#666;">🏛️ {{ s.entidad }} | 📍 {{ s.ubicacion }} ({{ s.modalidad }})</small>
+                    <small style="color:#666;">🏛️ {{ s.entidad }} | {{ s.ubicacion }} ({{ s.modalidad }})</small>
                     
                     <!-- Descripción visible para el cliente -->
                     <p style="font-size:14px; color:#444; background:#f8f9fa; padding:10px; border-radius:6px; margin:10px 0;">
@@ -84,7 +87,7 @@
 
                     <div class="acciones">
                         <button class="btn btn-voz" onclick="leer('{{ s.titulo }}. {{ s.descripcion }}. Precio {{ s.precio_descuento }} bolivianos')">🔊 Leer</button>
-                        <a href="{% url 'chat' s.titulo %}" class="btn btn-chat">💬 Contactar</a>
+                        <a href="{% url 'chat' s.titulo %}?rol=cliente" class="btn btn-chat">💬 Contactar</a>
                     </div>
                 </div>
             </div>

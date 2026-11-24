@@ -4,26 +4,26 @@
     <meta charset="UTF-8">
     <title>Panel Estudiante - Mi Cuenta</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #a4a6aa; padding: 20px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #4c8399; padding: 20px; }
         .wrapper { max-width: 1100px; margin: auto; }
         .nav { margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .nav a { text-decoration: none; color: #0d6efd; font-weight: bold; }
+        .nav a { text-decoration: none; color: #000000; font-weight: bold; }
         .grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 20px; }
-        .card { background: rgb(177, 240, 237); padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        h2, h3 { color: #0d6efd; margin-top: 0; }
-        label { display: block; font-weight: bold; margin-top: 12px; color: #333; font-size: 13px; }
+        .card { background: rgb(255, 255, 255); padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        h2, h3 { color: #196a90; margin-top: 0; }
+        label { display: block; font-weight: bold; margin-top: 12px; color: #333; font-size: 14px; }
         input, textarea, select { width: 100%; padding: 9px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
         .input-voz { display: flex; gap: 6px; margin-top: 4px; align-items: stretch; }
-        .btn-micro { background: #0d6efd; color: white; border: none; border-radius: 6px; padding: 0 12px; cursor: pointer; font-size: 16px; transition: 0.2s; }
-        .btn-micro:hover { background: #0d6efd; }
+        .btn-micro { background: #5baacf; color: rgb(255, 0, 0); border: none; border-radius: 6px; padding: 0 12px; cursor: pointer; font-size: 16px; transition: 0.2s; }
+        .btn-micro:hover { background: #5baacf; }
         .row { display: flex; gap: 12px; }
         .row > div { flex: 1; }
-        .btn-primary { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 15px; background: #0d6efd; color: white; font-size: 15px; }
+        .btn-primary { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 15px; background: #5baacf; color: white; font-size: 15px; }
         .alert { padding: 12px; border-radius: 8px; margin-bottom: 15px; font-weight: bold; }
         .alert.success { background: #d1e7dd; color: #0f5132; }
         .alert.error { background: #f8d7da; color: #842029; }
         .item-oferta { border: 1px solid #e9ecef; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; }
-        .btn-borrar { background: #0d6efd; color: white; text-decoration: none; padding: 6px 12px; border-radius: 5px; font-size: 12px; font-weight: bold; }
+        .btn-borrar { background: #5baacf; color: white; text-decoration: none; padding: 6px 12px; border-radius: 5px; font-size: 12px; font-weight: bold; }
         #barra-voz { background: #fff3cd; color: #664d03; padding: 8px 12px; border-radius: 6px; font-size: 13px; margin-bottom: 10px; display: none; font-weight: bold; }
         @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
     </style>
@@ -31,8 +31,13 @@
 <body>
     <div class="wrapper">
         <div class="nav">
-            <a href="{% url 'portada' %}">⬅ Volver a Portada</a>
-            <span>Cuenta activa: <b>{{ autor_actual|default:"Sin iniciar sesión" }}</b></span>
+          <a href="{% url 'portada' %}">⬅ Volver a Portada</a>
+           <div>
+               <span>Cuenta: <b>{{ autor_actual|default:"Invitado" }}</b></span>
+               {% if autor_actual %}
+                   |<a href="?cerrar_sesion=1" style="color:#ad1625;">Cerrar Sesión</a>
+               {% endif %}
+           </div>
         </div>
 
         {% if mensaje %}
@@ -70,6 +75,10 @@
                         <option value="derecho">Derecho / Ciencias Jurídicas</option>
                         <option value="agronomia">Agronomía / Veterinaria</option>
                         <option value="humanidades">Humanidades / Idiomas / Educación</option>
+                        <option value="química"> Química </option>
+                        <option value="electromecánica">Electromecánica/ Eléctrica / Electrónica  </option>
+                        <option value="biología"> biología  </option>
+                        <option value="matemáticas">Matemáticas </option>
                     </select>
 
                     <label>Título del servicio:</label>
@@ -86,11 +95,11 @@
 
                     <div class="row">
                         <div>
-                            <label>Precio Normal ($):</label>
+                            <label>Precio Normal (Bs):</label>
                             <input type="number" name="precio_original" value="100" required style="margin-top:4px;">
                         </div>
                         <div>
-                            <label>Precio Oferta ($):</label>
+                            <label>Precio Oferta (Bs):</label>
                             <input type="number" name="precio_descuento" value="80" required style="margin-top:4px;">
                         </div>
                     </div>
@@ -118,7 +127,7 @@
                         <option value="Remoto">Remoto</option>
                     </select>
 
-                    <label>Carnet Universitario (Verificación OpenCV):</label>
+                    <label>Carnet Universitario:</label>
                     <input type="file" name="carnet" accept="image/*" style="margin-top:4px;">
 
                     <button type="submit" class="btn-primary">Verificar y Publicar Servicio</button>
@@ -127,7 +136,7 @@
 
             <!-- COLUMNA DERECHA: ACCESO SEGURO CON PIN -->
             <div class="card">
-                <h3>🔐 Gestionar Mis Publicaciones</h3>
+                <h3>Gestionar Mis Publicaciones</h3>
                 <p style="font-size:13px; color:#666;">Ingresa tu nombre y tu PIN de 4 dígitos para administrar o eliminar tus ofertas:</p>
                 
                 <form method="GET" style="display:flex; gap:8px; margin-bottom:15px;">
@@ -145,42 +154,86 @@
                             <b>{{ o.titulo }}</b><br>
                             <small style="color:#555;">{{ o.categoria|upper }} | ${{ o.precio_descuento }} | ⭐ {{ o.popularidad }}</small>
                         </div>
-                        <a href="?eliminar={{ o.titulo }}" class="btn-borrar" onclick="return confirm('¿Seguro que deseas eliminar esta publicación?')">🗑️ Eliminar</a>
+                        <div style="display:flex; gap:6px;">
+                            <a href="{% url 'chat' o.titulo %}?rol=estudiante" style="background:#198754; color:white; text-decoration:none; padding:6px 10px; border-radius:5px; font-size:12px; font-weight:bold;">💬 Chat</a>
+                            <a href="?eliminar={{ o.titulo }}" class="btn-borrar" onclick="return confirm('¿Seguro que deseas eliminar esta publicación?')">🗑️</a>
+                        </div>
                     </div>
                 {% empty %}
-                    <p style="text-align:center; color:#888; margin-top:30px;">
+                    <p style="text-align:center; color:#888; margin-top:20px;">
                         {% if autor_actual %}
                             No se encontraron ofertas con ese Nombre y PIN.
                         {% else %}
-                            Inicia sesión arriba con tu Nombre y PIN para ver tus ofertas.
+                            Inicia sesión arriba con tu Nombre y PIN para ver tus ofertas y mensajes.
                         {% endif %}
                     </p>
                 {% endfor %}
+
+                {% if url_carnet %}
+                    <div style="margin-top:20px; text-align:center; border-top:1px solid #eee; padding-top:15px;">
+                        <h4 style="margin:0 0 10px 0; color:#198754;">🪪 Resultado del Hilo OpenCV (Alto Contraste):</h4>
+                        <img src="{{ url_carnet }}?t={% now 'U' %}" alt="Carnet Verificado" style="max-width:100%; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.2);">
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>
 
     <script>
+        let reconocimientoActivo = null;
+
         function dictarA(idCampo) {
             const barra = document.getElementById('barra-voz');
             const campo = document.getElementById(idCampo);
 
             if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
                 barra.style.display = 'block';
-barra.innerText = "⚠️ Tu navegador no soporta voz. Usa Google Chrome o Edge.";
-return;
-}
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-const rec = new SpeechRecognition();
-rec.lang = 'es-BO';
-barra.style.display = 'block';
-barra.innerText = "🔴 Escuchando... Habla ahora para llenar el campo.";
-rec.start();
-rec.onresult = (e) => {
-campo.value = e.results.transcript;
-barra.innerText = "✅ Texto capturado: '" + e.results.transcript + "'";
-};
-rec.onerror = (e) => {
-barra.innerText = "❌ Error de micrófono: " + e.error + " (Verifica permisos e internet).";
-};
-}
+                barra.innerText = "⚠️ Tu navegador no soporta voz. Usa Google Chrome o Microsoft Edge.";
+                return;
+            }
+
+            // Si ya había un micrófono escuchando, lo detenemos antes de abrir otro
+            if (reconocimientoActivo) {
+                reconocimientoActivo.stop();
+            }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const rec = new SpeechRecognition();
+            reconocimientoActivo = rec;
+            
+            rec.lang = 'es-ES'; // Español estándar (más compatible en Windows)
+            rec.interimResults = false;
+            rec.maxAlternatives = 1;
+            
+            barra.style.display = 'block';
+            barra.style.background = "#fff3cd";
+            barra.style.color = "#664d03";
+            barra.innerText = "🔴 Escuchando... Habla ahora cerca del micrófono.";
+
+            rec.start();
+
+            rec.onresult = (e) => {
+                // CORRECCIÓN AQUÍ: Se agregaron los índices [0][0]
+                const textoCapturado = e.results[0][0].transcript;
+                campo.value = textoCapturado;
+                
+                barra.style.background = "#d1e7dd";
+                barra.style.color = "#0f5132";
+                barra.innerText = "✅ Capturado: '" + textoCapturado + "'";
+            };
+
+            rec.onerror = (e) => {
+                barra.style.background = "#f8d7da";
+                barra.style.color = "#842029";
+                if (e.error === 'not-allowed') {
+                    barra.innerText = "❌ Permiso denegado. Haz clic en el candado junto a http://127.0.0.1:8000 y permite el micrófono.";
+                } else if (e.error === 'no-speech') {
+                    barra.innerText = "⚠️ No se detectó voz. Revisa que tu micrófono no esté silenciado en Windows.";
+                } else if (e.error === 'network') {
+                    barra.innerText = "❌ Error de red: Chrome necesita conexión a internet para transcribir voz.";
+                } else {
+                    barra.innerText = "❌ Error: " + e.error;
+                }
+            };
+        }
+    </script>

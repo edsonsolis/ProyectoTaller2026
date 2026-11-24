@@ -1,4 +1,55 @@
 <?xml version='1.0' encoding='utf-8'?>
 <ofertas>
-    
-<oferta><titulo>Ayudante de Python</titulo><categoria>sistemas</categoria><descripcion>Ayudante de introducciona programacion y estructura de datos</descripcion><pin>1234</pin><precio_original>100.0</precio_original><precio_descuento>80.0</precio_descuento><modalidad>Remoto</modalidad><ubicacion>Cochabamba</ubicacion><entidad>Juan Perez Velazco (UMSS)</entidad><fecha_expiracion /><popularidad>5.0</popularidad></oferta></ofertas>
+    <oferta>
+        <titulo>Ayudante de Python</titulo>
+        <categoria>sistemas</categoria>
+        <descripcion>Se ayuda en estructura de datos y recursividad</descripcion>
+        <pin>1234</pin>
+        <precio_original>100.0</precio_original>
+        <precio_descuento>80.0</precio_descuento>
+        <modalidad>Presencial</modalidad>
+        <ubicacion>Cochabamba</ubicacion>
+        <entidad>Juan Perez Velazco (UMSS)</entidad>
+        <fecha_expiracion />
+        <popularidad>3.5</popularidad>
+    </oferta>
+    <oferta>
+        <titulo>reparación de computadoras</titulo>
+        <categoria>sistemas</categoria>
+        <descripcion>se ayudan en el mantenimiento y reparación del Hardware</descripcion>
+        <pin>1234</pin>
+        <precio_original>100.0</precio_original>
+        <precio_descuento>80.0</precio_descuento>
+        <modalidad>Presencial</modalidad>
+        <ubicacion>Cochabamba</ubicacion>
+        <entidad>Juan Perez Velazco (UMSS)</entidad>
+        <fecha_expiracion />
+        <popularidad>4.5</popularidad>
+    </oferta>
+    <oferta>
+        <titulo>ayudante de enfermería</titulo>
+        <categoria>medicina</categoria>
+        <descripcion>salida de control de signos vitales y control de administración de medicamentos</descripcion>
+        <pin>1235</pin>
+        <precio_original>110.0</precio_original>
+        <precio_descuento>100.0</precio_descuento>
+        <modalidad>Presencial</modalidad>
+        <ubicacion>Cochabamba</ubicacion>
+        <entidad>Ana González rosas (UMSS)</entidad>
+        <fecha_expiracion />
+        <popularidad>5.0</popularidad>
+    </oferta>
+    <oferta>
+        <titulo>laboratorio</titulo>
+        <categoria>biología</categoria>
+        <descripcion>se ayuda en la limpieza y mantenimiento de laboratorio</descripcion>
+        <pin>1236</pin>
+        <precio_original>150.0</precio_original>
+        <precio_descuento>120.0</precio_descuento>
+        <modalidad>Presencial</modalidad>
+        <ubicacion>Santa Cruz</ubicacion>
+        <entidad>Pedro Chávez rojas (udabol)</entidad>
+        <fecha_expiracion />
+        <popularidad>5.0</popularidad>
+    </oferta>
+</ofertas>

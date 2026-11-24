@@ -1,5 +1,8 @@
+import os
+import time
+from django.conf import settings
 from django.shortcuts import render, redirect
-from .utils import BaseDatosXML, analizar_texto_nlp, GestorEventos, COLA_MENSAJES_CHAT
+from .utils import BaseDatosXML, analizar_texto_nlp, GestorEventos, obtener_cola_chat, guardar_imagen_en_hilo
 from FiltroDeOferta.Oferta import Oferta, MotorOfertas
 
 def vista_portada(request):
@@ -9,7 +12,11 @@ def vista_estudiante(request):
     db = BaseDatosXML()
     mensaje = ""
     tipo_alerta = "success"
-
+    url_carnet_procesado = ""
+    # 0. CERRAR SESIÓN DEL ESTUDIANTE
+    if 'cerrar_sesion' in request.GET:
+        request.session.flush()
+        return redirect('portada')
     # 1. ELIMINAR OFERTA (Validando PIN)
     titulo_eliminar = request.GET.get('eliminar', '')
     if titulo_eliminar:
@@ -20,7 +27,7 @@ def vista_estudiante(request):
             mensaje = "❌ No tienes permiso para eliminar esta publicación."
             tipo_alerta = "error"
 
-    # 2. PUBLICAR NUEVA OFERTA
+    # 2. PUBLICAR NUEVA OFERTA + PROCESAR CARNET EN HILO OPENCV
     if request.method == 'POST':
         nombre = request.POST.get('nombre_estudiante', '').strip()
         pin = request.POST.get('pin', '').strip()
@@ -36,6 +43,20 @@ def vista_estudiante(request):
         ubicacion = request.POST.get('ubicacion', 'Cochabamba')
         modalidad = request.POST.get('modalidad', 'Presencial')
         
+        # Guardar imagen subida y procesarla en Hilo Secundario con OpenCV
+        archivo_carnet = request.FILES.get('carnet')
+        if archivo_carnet:
+            os.makedirs(settings.MEDIA_ROOT, exist_ok=True)
+            ruta_guardado = os.path.join(settings.MEDIA_ROOT, 'carnet_verificado.jpg')
+            with open(ruta_guardado, 'wb+') as destino:
+                for chunk in archivo_carnet.chunks():
+                    destino.write(chunk)
+            
+            # Lanzamos el hilo de OpenCV
+            guardar_imagen_en_hilo(ruta_guardado)
+            time.sleep(0.3) # Breve pausa para que el hilo alcance a escribir antes de recargar
+            url_carnet_procesado = settings.MEDIA_URL + 'carnet_verificado.jpg'
+
         analisis_nlp = analizar_texto_nlp(descripcion)
         info_autor = f"{nombre} ({universidad})"
         
@@ -48,14 +69,14 @@ def vista_estudiante(request):
             ubicacion=ubicacion,
             entidad=info_autor,
             fecha_expiracion=None,
-            popularidad=5.0  # Empieza con 5.0 estrellas
+            popularidad=5.0
         )
         
         db.guardar_oferta(nueva_oferta, descripcion, pin)
         GestorEventos.disparar('oferta_creada', nueva_oferta)
-        mensaje = f"✅ ¡Publicado en {carrera.upper()}! (NLP procesó {analisis_nlp['cantidad']} palabras clave)."
+        mensaje = f"✅ ¡Publicado en {carrera.upper()}! (NLP analizó {analisis_nlp['cantidad']} palabras clave)."
 
-    # 3. INICIAR SESIÓN EN MI CUENTA (Nombre + PIN)
+    # 3. INICIAR SESIÓN EN MI CUENTA
     if 'buscar_cuenta' in request.GET:
         request.session['estudiante_actual'] = request.GET.get('autor', '').strip()
         request.session['pin_actual'] = request.GET.get('pin_login', '').strip()
@@ -73,20 +94,19 @@ def vista_estudiante(request):
         'tipo_alerta': tipo_alerta,
         'autor_actual': autor_actual,
         'pin_actual': pin_actual,
-        'mis_ofertas': mis_ofertas
+        'mis_ofertas': mis_ofertas,
+        'url_carnet': url_carnet_procesado
     })
 
 def vista_cliente(request):
     db = BaseDatosXML()
 
-    # 1. RECIBIR CALIFICACIÓN DE ESTRELLAS
     calificar_titulo = request.GET.get('calificar', '')
     puntos = request.GET.get('puntos', '')
     if calificar_titulo and puntos.isdigit():
         db.calificar_oferta(calificar_titulo, float(puntos))
-        return redirect('cliente') # Recarga limpia para ver el nuevo orden en la Cola de Prioridad
+        return redirect('cliente')
 
-    # 2. CARGAR Y FILTRAR CON TU LIBRERÍA PROPIA
     servicios_priorizados = db.cargar_ofertas_priorizadas()
     motor = MotorOfertas(servicios_priorizados)
     
@@ -105,14 +125,29 @@ def vista_cliente(request):
     })
 
 def vista_chat(request, titulo_oferta):
+    cola_actual = obtener_cola_chat(titulo_oferta)
+    
+    # Detectamos el rol según el botón desde donde hiciste clic (?rol=estudiante o ?rol=cliente)
+    rol_param = request.GET.get('rol', 'cliente')
+    es_estudiante = (rol_param == 'estudiante')
+    
+    nombre_est = request.session.get('estudiante_actual', 'Estudiante')
+    rol_usuario = f"Estudiante ({nombre_est})" if es_estudiante else "Cliente Interesado"
+
     if request.method == 'POST':
-        remitente = request.POST.get('remitente', 'Cliente')
         texto = request.POST.get('mensaje', '')
         if texto.strip():
-            COLA_MENSAJES_CHAT.append({'remitente': remitente, 'texto': texto})
+            cola_actual.append({
+                'remitente': rol_usuario,
+                'es_estudiante': es_estudiante,
+                'texto': texto
+            })
 
     return render(request, 'core/chat.html', {
         'titulo_oferta': titulo_oferta,
-        'mensajes': list(COLA_MENSAJES_CHAT)
+        'mensajes': list(cola_actual),
+        'es_estudiante': es_estudiante,
+        'rol_usuario': rol_usuario
     })
+
 

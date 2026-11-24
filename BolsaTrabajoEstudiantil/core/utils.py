@@ -10,12 +10,16 @@ from datetime import datetime
 from FiltroDeOferta.Oferta import Oferta
 
 XML_PATH = os.path.join(os.path.dirname(__file__), '../servicios.xml')
-COLA_MENSAJES_CHAT = deque(maxlen=50)
+CHATS_POR_OFERTA = {}
+
+def obtener_cola_chat(titulo_oferta: str) -> deque:
+    if titulo_oferta not in CHATS_POR_OFERTA:
+        CHATS_POR_OFERTA[titulo_oferta] = deque(maxlen=50)
+    return CHATS_POR_OFERTA[titulo_oferta]
 
 def quitar_tildes(texto: str) -> str:
     """Normaliza caracteres eliminando tildes para el procesamiento NLP (Punto 3)."""
-    return ''.join(
-        c for c in unicodedata.normalize('NFD', texto)
+    return ''.join(c for c in unicodedata.normalize('NFD', texto)
         if unicodedata.category(c) != 'Mn'
     )
 
@@ -89,7 +93,7 @@ class BaseDatosXML:
         ET.SubElement(nueva, 'entidad').text = oferta.entidad
         ET.SubElement(nueva, 'fecha_expiracion').text = ""
         ET.SubElement(nueva, 'popularidad').text = str(oferta.popularidad)
-
+        ET.indent(tree, space="    ")
         tree.write(XML_PATH, encoding='utf-8', xml_declaration=True)
 
     def eliminar_oferta_segura(self, titulo_a_borrar: str, pin_ingresado: str) -> bool:
@@ -133,17 +137,26 @@ class BaseDatosXML:
 
 # --- HILOS Y OPENCV (Puntos 2 y 6) ---
 def procesar_imagen_accesibilidad(ruta_imagen: str):
-    print(f"🧵 [HILO PARALELO {threading.current_thread().name}]: Procesando contraste con OpenCV...")
+    print(f"🧵 [HILO PARALELO {threading.current_thread().name}]: Procesando Carnet con OpenCV...")
     if not os.path.exists(ruta_imagen):
         return
     img = cv2.imread(ruta_imagen)
     if img is None:
         return
+    
+    # 1. Filtro de accesibilidad: Alto contraste CLAHE para baja visión
     lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
     l, a, b = cv2.split(lab)
     clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8,8))
     img_accesible = cv2.cvtColor(cv2.merge((clahe.apply(l), a, b)), cv2.COLOR_LAB2BGR)
+    
+    # 2. Dibujamos marco verde y sello de verificación con OpenCV
+    alto, ancho, _ = img_accesible.shape
+    cv2.rectangle(img_accesible, (5, 5), (ancho - 5, alto - 5), (0, 200, 0), 6)
+    cv2.putText(img_accesible, "VERIFICADO OPENCV", (15, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+    
     cv2.imwrite(ruta_imagen, img_accesible)
+    print(f"✅ [HILO PARALELO {threading.current_thread().name}]: Imagen procesada y guardada.")
 
 def guardar_imagen_en_hilo(ruta_destino: str):
     threading.Thread(target=procesar_imagen_accesibilidad, args=(ruta_destino,)).start()
@@ -163,6 +176,6 @@ class GestorEventos:
             funcion(datos)
 
 GestorEventos.suscribir('oferta_creada', lambda o: print(f"📝 [AUDITORÍA]: Publicado '{o.titulo}' por {o.entidad}"))
-GestorEventos.suscribir('oferta_creada', lambda o: guardar_imagen_en_hilo(os.path.join(os.path.dirname(__file__), '../foto_estudiante.jpg')))
+
 
 
